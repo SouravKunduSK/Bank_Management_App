@@ -3,7 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35506.116 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank_Management_Data", "Bank_Management_Data\Bank_Management_Data.csproj", "{225ACA68-C968-4D65-A6DF-8DBABEAF4920}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank_Management_Api", "Bank_Management_Api\Bank_Management_Api.csproj", "{3E5E0E3F-1377-4E00-A01B-99D936253E92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank_Management_UI", "Bank_Management_UI\Bank_Management_UI.csproj", "{A1B03768-BEA8-4B74-8364-436B3626AE76}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{225ACA68-C968-4D65-A6DF-8DBABEAF4920}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{225ACA68-C968-4D65-A6DF-8DBABEAF4920}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{225ACA68-C968-4D65-A6DF-8DBABEAF4920}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{225ACA68-C968-4D65-A6DF-8DBABEAF4920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E5E0E3F-1377-4E00-A01B-99D936253E92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E5E0E3F-1377-4E00-A01B-99D936253E92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E5E0E3F-1377-4E00-A01B-99D936253E92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E5E0E3F-1377-4E00-A01B-99D936253E92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B03768-BEA8-4B74-8364-436B3626AE76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B03768-BEA8-4B74-8364-436B3626AE76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B03768-BEA8-4B74-8364-436B3626AE76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B03768-BEA8-4B74-8364-436B3626AE76}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
