@@ -1,5 +1,17 @@
-var builder = WebApplication.CreateBuilder(args);
+using Bank_Management_Data.Data;
+using Bank_Management_Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
+var builder = WebApplication.CreateBuilder(args);
+// Add database context
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -23,5 +35,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+//seed database
+await DbInitializer.SeedDefaultAsync(app);
 app.Run();
