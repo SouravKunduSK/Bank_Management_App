@@ -24,7 +24,8 @@ namespace Bank_Management_Data.Data
             builder.Entity<RefreshToken>()
                 .HasOne(rt => rt.User)
                 .WithMany(u => u.RefreshTokens)
-                .HasForeignKey(rt => rt.UserId);
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

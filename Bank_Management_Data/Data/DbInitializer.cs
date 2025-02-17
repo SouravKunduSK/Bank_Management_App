@@ -40,15 +40,16 @@ namespace Bank_Management_Data.Data
                     }
 
                     //seed admin
-                    var adminEmail = "admin@bank.com";
+                    var adminEmail = "180144.cse@student.just.edu.bd";
                     if(await userManager.FindByEmailAsync(adminEmail) == null)
                     {
                         var admin = new AppUser
                         {
-                            FullName = "Admin",
+                            FullName = "Admin-User",
                             Email = adminEmail,
                             UserName = adminEmail,
-                            EmailConfirmed = true
+                            EmailConfirmed = true,
+                            CreatedAt = DateTime.UtcNow
                         };
                         var adminPassword = "Admin@1234";
                         await userManager.CreateAsync(admin, adminPassword);
