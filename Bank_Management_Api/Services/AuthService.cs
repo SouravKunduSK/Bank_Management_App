@@ -1,7 +1,9 @@
 ﻿using Bank_Management_Api.Models;
 using Bank_Management_Api.Services.Interfaces;
+using Bank_Management_Data.Data;
 using Bank_Management_Data.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,14 +18,16 @@ namespace Bank_Management_Api.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppDbContext _context;
 
         public AuthService(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+            IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AppDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _context = context;
         }
         public async Task<AuthResponse> Login(LoginModel model)
         {
@@ -39,9 +43,39 @@ namespace Bank_Management_Api.Services
             return new AuthResponse { Token = token, RefreshToken = refreshToken.Token, Message = "Login Successful!" };
         }
 
-        public Task<AuthResponse> RefreshToken(string token)
+        public async Task<AuthResponse> RefreshToken(string token)
         {
-            throw new NotImplementedException();
+            var refreshToken = await _context.RefreshTokens
+                .Include(rt=>rt.User)
+                .ThenInclude(u=>u.RefreshTokens)
+                .FirstOrDefaultAsync(rt=> rt.Token == token);
+            if (refreshToken == null)
+                return new AuthResponse { Message = "Invalid refresh token" };
+
+            if (refreshToken.Expires < DateTime.UtcNow)
+                return new AuthResponse { Message = "Token expired" };
+
+            if (refreshToken.Revoked != null)
+                return new AuthResponse { Message = "Token revoked" };
+
+            // Revoke current token
+            refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = GetIpAddress();
+            refreshToken.ReplacedByToken = null;
+
+            // Generate new tokens
+            var newRefreshToken = GenerateRefreshToken();
+            refreshToken.User.RefreshTokens.Add(newRefreshToken);
+            await _context.SaveChangesAsync();
+
+            var jwtToken = GenerateJwtToken(refreshToken.User);
+
+            return new AuthResponse
+            {
+                Token = jwtToken,
+                RefreshToken = newRefreshToken.Token,
+                Message = "Token refreshed successfully"
+            };
         }
 
         public async Task<AuthResponse> RegisterUser(RegisterModel model, string creatorEmail)
@@ -79,9 +113,19 @@ namespace Bank_Management_Api.Services
             return new AuthResponse { Message = "User registered successfully!" };
         }
 
-        public Task<bool> RevokeToken(string token)
+        public async Task<bool> RevokeToken(string token)
         {
-            throw new NotImplementedException();
+            var refreshToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == token);
+
+            if (refreshToken == null || refreshToken.Revoked != null)
+                return false;
+
+            refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = GetIpAddress();
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         private string GenerateJwtToken(AppUser user)
@@ -92,13 +136,15 @@ namespace Bank_Management_Api.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, role.FirstOrDefault())
+                new Claim(ClaimTypes.Role, role.FirstOrDefault()),
+                new Claim(ClaimTypes.Actor, user.Id)
             };
 
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Issuer"], claims, expires: DateTime.UtcNow.AddMinutes(30), signingCredentials: creds);
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Issuer"], claims, 
+                expires: DateTime.UtcNow.AddMinutes(30), signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -107,7 +153,7 @@ namespace Bank_Management_Api.Services
             return new RefreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(300),
                 CreatedByIp = GetIpAddress(),
                 ReplacedByToken = string.Empty
             };

@@ -4,6 +4,7 @@ using Bank_Management_Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
@@ -51,8 +52,79 @@ namespace Bank_Management_Api.Controllers
             var response = await _authService.Login(model);
             if (response.Token == null)
                 return Unauthorized(response);
+            var ipAddress = GetIpAddress();
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+            var deviceType = GetDeviceType(userAgent);
+            /*await _emailService.SendEmailAsync(model.Email, "New Login Alert",
+        $"<p>New login detected on your account:</p>" +
+        $"<ul>" +
+        $"<li><strong>Time:</strong> {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</li>" +
+        $"<li><strong>Device:</strong> {deviceType}</li>" +
+        $"<li><strong>IP Address:</strong> {ipAddress}</li>" +
+        $"</ul>" +
+        $"<p>If this wasn't you, secure your account immediately.</p>");*/
+            return Ok(response);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenModel model)
+        {
+            if (string.IsNullOrEmpty(model.Token))
+                return BadRequest("Invalid token");
+
+            var response = await _authService.RefreshToken(model.Token);
+
+            if (response.Message != "Token refreshed successfully")
+                return BadRequest(response.Message);
 
             return Ok(response);
+        }
+
+        [HttpPost("revoke-token")]
+        [Authorize]  // Optional: Restrict to authenticated users
+        public async Task<IActionResult> RevokeToken([FromBody] RevokeTokenModel model)
+        {
+            if (string.IsNullOrEmpty(model.Token))
+                return BadRequest("Token is required");
+
+            var result = await _authService.RevokeToken(model.Token);
+
+            if (!result)
+                return BadRequest("Token revocation failed");
+
+            return Ok("Token revoked successfully");
+        }
+
+        // Models for request bodies
+        public class RefreshTokenModel
+        {
+            public string Token { get; set; }
+        }
+
+        public class RevokeTokenModel
+        {
+            public string Token { get; set; }
+        }
+        private string GetIpAddress()
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            if (ip == null) return "Unknown IP";
+
+            if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                ip = ip.MapToIPv4();
+
+            return ip.ToString();
+        }
+
+        private string GetDeviceType(string userAgent)
+        {
+            userAgent = userAgent.ToLower();
+            if (userAgent.Contains("mobile")) return "Mobile";
+            if (userAgent.Contains("tablet")) return "Tablet";
+            if (userAgent.Contains("windows")) return "Windows PC";
+            if (userAgent.Contains("mac")) return "Mac";
+            if (userAgent.Contains("linux")) return "Linux PC";
+            return "Unknown Device";
         }
     }
 }
