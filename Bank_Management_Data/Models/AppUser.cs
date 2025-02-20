@@ -12,5 +12,8 @@ namespace Bank_Management_Data.Models
         public string FullName { get; set; }
         public DateTime CreatedAt { get; set; }
         public virtual List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+        // Navigation Property
+        public List<Account> Accounts { get; set; } // one use may have multiple accounts
     }
 }

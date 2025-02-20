@@ -55,14 +55,14 @@ namespace Bank_Management_Api.Controllers
             var ipAddress = GetIpAddress();
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
             var deviceType = GetDeviceType(userAgent);
-            await _emailService.SendEmailAsync(model.Email, "New Login Alert",
+            /*await _emailService.SendEmailAsync(model.Email, "New Login Alert",
         $"<p>New login detected on your account:</p>" +
         $"<ul>" +
         $"<li><strong>Time:</strong> {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</li>" +
         $"<li><strong>Device:</strong> {deviceType}</li>" +
         $"<li><strong>IP Address:</strong> {ipAddress}</li>" +
         $"</ul>" +
-        $"<p>If this wasn't you, secure your account immediately.</p>");
+        $"<p>If this wasn't you, secure your account immediately.</p>");*/
             return Ok(response);
         }
 

@@ -38,6 +38,11 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+//builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+
+
+builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

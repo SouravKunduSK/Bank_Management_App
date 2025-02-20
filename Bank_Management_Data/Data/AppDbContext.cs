@@ -17,7 +17,10 @@ namespace Bank_Management_Data.Data
         }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
+        public DbSet<ExchangeRate> ExchangeRates { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -26,6 +29,20 @@ namespace Bank_Management_Data.Data
                 .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Account>()
+                .HasOne(a=>a.User)
+                .WithMany(u => u.Accounts)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Account>()
+                .HasIndex(a => a.AccountNumber)
+                .IsUnique();
+            builder.Entity<Account>()
+                .HasOne(cu => cu.Currency)
+                .WithMany(a => a.Accounts)
+                .HasForeignKey(cu => cu.CurrencyId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
         }
     }
 }
