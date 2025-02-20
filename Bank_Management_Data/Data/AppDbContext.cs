@@ -20,7 +20,7 @@ namespace Bank_Management_Data.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<ExchangeRate> ExchangeRates { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<FundTransaction> Transactions { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -42,6 +42,8 @@ namespace Bank_Management_Data.Data
                 .WithMany(a => a.Accounts)
                 .HasForeignKey(cu => cu.CurrencyId)
                 .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<FundTransaction>()
+                .HasKey(a => a.TransactionId);
                 
         }
     }

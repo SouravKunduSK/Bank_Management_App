@@ -39,6 +39,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 //builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 
 

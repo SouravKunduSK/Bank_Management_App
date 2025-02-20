@@ -56,12 +56,13 @@ namespace Bank_Management_Api.Services
                 CurrencyId = currency.CurrencyId
             };
 
-            var transaction = new Transaction
+            var transaction = new FundTransaction
             {
                 TransactionId = GenerateGUIDNumber.GenerateNumberUsingGuid(),
                 AccountNumber = account.AccountNumber,
                 Type = TransactionType.Deposit,
-                Amount = account.Balance
+                Amount = account.Balance,
+                Account = account
             };
 
 
