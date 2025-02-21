@@ -62,10 +62,10 @@ namespace Bank_Management_Api.Controllers
         private async Task<string> GetUserId(string accountNumber) 
         {
             string? userId;
-            if (User.IsInRole("Admin, BankStaff"))
+            if (User.IsInRole("Admin") || User.IsInRole("BankStaff"))
             {
                 var account = await _context.Accounts.FirstOrDefaultAsync(ac => ac.AccountNumber == accountNumber);
-                userId = account?.User.Id;
+                userId = account?.UserId;
             }
             else if (User.IsInRole("Customer"))
             {

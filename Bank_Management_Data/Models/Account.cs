@@ -11,10 +11,13 @@ namespace Bank_Management_Data.Models
     {
         public int Id { get; set; }
         public string AccountNumber { get; set; }
-        public  AccountType Type { get; set; }
         public decimal Balance { get; set; }
         public AccountStatus Status { get; set; } = AccountStatus.OnProcessing; // OnProcessing, Active, Frozen, Closed
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        //Account type
+        public int AccountTypeId { get; set; }
+        public AccountType AccountType { get; set; }
 
         // Currency-related
         public int CurrencyId { get; set; }
@@ -23,5 +26,7 @@ namespace Bank_Management_Data.Models
         // Navigation Property
         public string UserId { get; set; }
         public AppUser User { get; set; }
+
+        public List<FundTransaction> Transactions { get; set; }
     }
 }

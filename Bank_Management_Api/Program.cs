@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Bank_Management_Api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add database context
@@ -40,6 +41,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IAccountTypeService, AccountTypeService>();
+builder.Services.AddScoped<CheckLimits>();
 //builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 
 
@@ -48,6 +51,7 @@ builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -70,3 +74,4 @@ app.MapControllers();
 //seed database
 await DbInitializer.SeedDefaultAsync(app);
 app.Run();
+

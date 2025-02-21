@@ -21,6 +21,22 @@ namespace Bank_Management_Data.Data
                 {
                     //Check Database is created
                     await context.Database.EnsureCreatedAsync();
+
+                    //seed account type
+                    if (context.AccountTypes.Any())
+                    {
+                        return;
+                    }
+
+                    var newAccountTypes = new AccountType[] {
+                        new AccountType { TypeName = "Savings", DailyMoneyTransactionLimit = 100000,DailyTransactionNumberLimit = 10, TransactionFee = 10 },
+                        new AccountType {  TypeName = "Current", DailyMoneyTransactionLimit = 200000,DailyTransactionNumberLimit = 15, TransactionFee = 5 },
+                        new AccountType {  TypeName = "Business", DailyMoneyTransactionLimit = 500000,DailyTransactionNumberLimit = 20, TransactionFee = 2 }
+                         };
+                    await context.AccountTypes.AddRangeAsync(newAccountTypes);
+                    await context.SaveChangesAsync();
+
+
                     if (context.UserRoles.Any() || context.Users.Any())
                     {
                         return;
@@ -55,6 +71,9 @@ namespace Bank_Management_Data.Data
                         await userManager.CreateAsync(admin, adminPassword);
                         await userManager.AddToRoleAsync(admin, roles[0]);
                     }
+
+                   
+                    
                 }
                 catch (Exception ex)
                 {

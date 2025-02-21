@@ -50,11 +50,14 @@ namespace Bank_Management_Api.Services
             var account = new Account
             {
                 AccountNumber = GenerateAccountNumberUsingGuid(), // Unique Account Number
-                Type = request.Type,
+                AccountTypeId = request.AccountTypeId,
                 Balance = request.InitialDeposit * exchangeRate,
                 UserId = userId,
-                CurrencyId = currency.CurrencyId
+                CurrencyId = currency.CurrencyId,
+                AccountType =await _context.AccountTypes.FindAsync(request.AccountTypeId)
+                 
             };
+
 
             var transaction = new FundTransaction
             {
@@ -73,7 +76,7 @@ namespace Bank_Management_Api.Services
             return new AccountResponse
             {
                 AccountNumber = account.AccountNumber,
-                Type = account.Type,
+                AccountType = account.AccountType.TypeName,
                 Balance = account.Balance,
                 Status = account.Status,
                 CreatedAt = account.CreatedAt,
@@ -105,7 +108,7 @@ namespace Bank_Management_Api.Services
             return new AccountResponse
             {
                 AccountNumber = account.AccountNumber,
-                Type = account.Type,
+                AccountType = account.AccountType.TypeName,
                 Balance = account.Balance,
                 Status = account.Status,
                 CreatedAt = account.CreatedAt,
@@ -128,7 +131,7 @@ namespace Bank_Management_Api.Services
             return accounts.Select(account => new AccountResponse
             {
                 AccountNumber = account.AccountNumber,
-                Type = account.Type,
+                AccountType = account.AccountType.TypeName,
                 Balance = account.Balance,
                 Status = account.Status,
                 CreatedAt = account.CreatedAt,

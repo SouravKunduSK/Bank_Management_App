@@ -4,7 +4,7 @@ namespace Bank_Management_Api.Models.Account
 {
     public class AccountRequest
     {
-        public AccountType Type { get; set; }
+        public int AccountTypeId { get; set; }
         public decimal InitialDeposit { get; set; }
         public string CurrencyCode { get; set; } = "BDT"; // Reference to Currency model
     }

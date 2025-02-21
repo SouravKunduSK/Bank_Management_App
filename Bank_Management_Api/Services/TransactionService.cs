@@ -5,20 +5,24 @@ using Bank_Management_Data.Data;
 using Bank_Management_Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
+using Bank_Management_Api.Helpers;
 
 namespace Bank_Management_Api.Services
 {
     public class TransactionService:ITransactionService
     {
         private readonly AppDbContext _context;
+        private readonly CheckLimits _limits;
 
-        public TransactionService(AppDbContext context)
+        public TransactionService(AppDbContext context, CheckLimits limits)
         {
             _context = context;
+            _limits = limits;
         }
 
         public async Task<TransactionResponse> DepositAsync(TransactionRequest request, string userId)
         {
+
             if (request.Amount <= 0)
                 throw new Exception("Amount must be greater than zero.");
 
@@ -26,7 +30,15 @@ namespace Bank_Management_Api.Services
                 .FirstOrDefaultAsync(a => a.AccountNumber == request.AccountNumber && a.UserId == userId);
 
             if (account == null)
+            {
                 throw new Exception("Account not found!");
+            }
+            
+            if (await _limits.IfLimitExceeds(account))
+            {
+                throw new Exception("Limit excceds for today!");
+            }
+            
             account.Balance += request.Amount;
             var transaction = new FundTransaction
             {
@@ -87,6 +99,10 @@ namespace Bank_Management_Api.Services
 
             if (sourceAccount.Balance < request.Amount)
                 throw new Exception("Insufficient funds!");
+            if (await _limits.IfLimitExceeds(sourceAccount) || await _limits.IfLimitExceeds(targetAccount))
+            {
+                throw new Exception("Limit excceds for today!");
+            }
 
             // Begin a database transaction
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -146,7 +162,10 @@ namespace Bank_Management_Api.Services
 
             if (account.Balance < request.Amount)
                 throw new Exception("Insufficient funds!");
-
+            if (await _limits.IfLimitExceeds(account))
+            {
+                throw new Exception("Limit excceds for today!");
+            }
             account.Balance -= request.Amount;
 
             var transaction = new FundTransaction
