@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Bank_Management_Data.Models
 {
-    public class Transaction
+    public class FundTransaction
     {
         public string TransactionId { get; set; }
         public string AccountNumber { get; set; }
         public TransactionType Type { get; set; }
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
-        public string TargetAccountNumber { get; set; }
+        public string? TargetAccountNumber { get; set; }
 
         // Navigation Properties
         public Account Account { get; set; }

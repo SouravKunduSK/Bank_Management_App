@@ -4,6 +4,7 @@ using Bank_Management_Data.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bank_Management_Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220174150_FundTransactionAdded")]
+    partial class FundTransactionAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,9 +37,6 @@ namespace Bank_Management_Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccountTypeId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
 
@@ -49,6 +49,9 @@ namespace Bank_Management_Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -58,39 +61,11 @@ namespace Bank_Management_Data.Migrations
                     b.HasIndex("AccountNumber")
                         .IsUnique();
 
-                    b.HasIndex("AccountTypeId");
-
                     b.HasIndex("CurrencyId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("Bank_Management_Data.Models.AccountType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("DailyMoneyTransactionLimit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DailyTransactionNumberLimit")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TransactionFee")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AccountTypes");
                 });
 
             modelBuilder.Entity("Bank_Management_Data.Models.AppUser", b =>
@@ -232,6 +207,7 @@ namespace Bank_Management_Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TargetAccountNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TransactionDate")
@@ -424,12 +400,6 @@ namespace Bank_Management_Data.Migrations
 
             modelBuilder.Entity("Bank_Management_Data.Models.Account", b =>
                 {
-                    b.HasOne("Bank_Management_Data.Models.AccountType", "AccountType")
-                        .WithMany("Accounts")
-                        .HasForeignKey("AccountTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Bank_Management_Data.Models.Currency", "Currency")
                         .WithMany("Accounts")
                         .HasForeignKey("CurrencyId")
@@ -442,8 +412,6 @@ namespace Bank_Management_Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AccountType");
-
                     b.Navigation("Currency");
 
                     b.Navigation("User");
@@ -452,7 +420,7 @@ namespace Bank_Management_Data.Migrations
             modelBuilder.Entity("Bank_Management_Data.Models.FundTransaction", b =>
                 {
                     b.HasOne("Bank_Management_Data.Models.Account", "Account")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -520,16 +488,6 @@ namespace Bank_Management_Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Bank_Management_Data.Models.Account", b =>
-                {
-                    b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("Bank_Management_Data.Models.AccountType", b =>
-                {
-                    b.Navigation("Accounts");
                 });
 
             modelBuilder.Entity("Bank_Management_Data.Models.AppUser", b =>
