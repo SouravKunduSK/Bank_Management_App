@@ -43,6 +43,10 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IAccountTypeService, AccountTypeService>();
 builder.Services.AddScoped<CheckLimits>();
+
+builder.Services.AddScoped<ILoanService, LoanService>();
+builder.Services.AddScoped<ILoanRepaymentService, LoanRepaymentService>();
+builder.Services.AddScoped<IInterestService, InterestService>();
 //builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 
 

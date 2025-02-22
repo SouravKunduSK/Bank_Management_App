@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,10 @@ namespace Bank_Management_Data.Data
         public DbSet<ExchangeRate> ExchangeRates { get; set; }
         public DbSet<AccountType> AccountTypes { get; set; }
         public DbSet<FundTransaction> Transactions { get; set; }
+        public DbSet<Loan> Loans { get; set; }
+        public DbSet<LoanType> LoanTypes { get; set; }
+        public DbSet<Interest> Interests { get; set; }
+        public DbSet<LoanRepayment> LoanRepayments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -52,7 +57,18 @@ namespace Bank_Management_Data.Data
                 .WithMany(at=>at.Accounts)
                 .HasForeignKey(a=>a.AccountTypeId)
                 .OnDelete(DeleteBehavior.Cascade);
-                
+            builder.Entity<Loan>()
+            .HasOne(l => l.Account)
+            .WithMany(a => a.Loans)
+            .HasForeignKey(l => l.AccountId)
+            .HasPrincipalKey(a => a.AccountNumber);
+
+            builder.Entity<Interest>()
+                .HasOne(i => i.Account)
+                .WithMany(a => a.Interests)
+                .HasForeignKey(i => i.AccountNumber)
+                .HasPrincipalKey(a => a.AccountNumber);
+
         }
     }
 }
