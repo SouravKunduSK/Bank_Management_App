@@ -26,7 +26,8 @@ namespace Bank_Management_Data.Models
         // Navigation Property
         public string UserId { get; set; }
         public AppUser User { get; set; }
-
         public List<FundTransaction> Transactions { get; set; }
+        public List<Loan> Loans { get; set; }
+        public List<Interest> Interests { get; set; }
     }
 }
