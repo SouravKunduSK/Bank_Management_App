@@ -119,11 +119,11 @@ Go to 'Manage NuGet Packages' or Open Package manager console in Visual Studio, 
 - `DELETE /api/Account/{accountNumber}` - Delete an account.
 
 #### Account Type (`https://localhost:7077/api/AccountType`)
-- GET /api/AccountType/all-account-types - Get all account types.
-- GET /api/AccountType/detail/{typeName} - View account type details.
-- POST /api/AccountType/create - Create a new account type.
-- PUT /api/AccountType/edit/{id} - Edit an account type.
-- DELETE /api/AccountType/delete/{id} - Delete an account type.
+- `GET /api/AccountType/all-account-types` - Get all account types.
+- `GET /api/AccountType/detail/{typeName}` - View account type details.
+- `POST /api/AccountType/create` - Create a new account type.
+- `PUT /api/AccountType/edit/{id}` - Edit an account type.
+- `DELETE /api/AccountType/delete/{id}` - Delete an account type.
 
 #### Transaction (`https://localhost:7077/api/Transaction`)
 - POST /api/Transaction/deposit - Deposit funds.
@@ -151,7 +151,23 @@ Go to 'Manage NuGet Packages' or Open Package manager console in Visual Studio, 
 #### Interest (`https://localhost:7077/api/Interest`)
 - POST/api/Interest/CalculateAndApplyInterest - Calculate and apply interest on loan account.
 ## FrontEnd
-![Alt text](C:/Project_SS/Login.jpg)
+Simple UI for consuming api
+### Login Page
+![Login](https://github.com/user-attachments/assets/9aa1404d-8f92-46cd-9664-712d8e157769)
+
+### Create Account
+![Create_Account](https://github.com/user-attachments/assets/bb85a41d-3c9f-4e04-b534-963b38a6891e)
+
+### All Account List
+![AccountList](https://github.com/user-attachments/assets/aaadff10-a8fa-4966-ae6f-b4168719bbc7)
+
+### Deposit
+![B_Deposit](https://github.com/user-attachments/assets/67ae5155-03af-419f-a439-f4c0cdce38ec)
+
+
+### Transaction
+![Transaction History](https://github.com/user-attachments/assets/364712b9-19ff-484a-98c9-d46c6a9094cc)
+
 
 ## Technology Stack
 
