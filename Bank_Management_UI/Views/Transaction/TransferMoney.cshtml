@@ -1,0 +1,87 @@
+﻿@model Bank_Management_UI.Models.Transaction.ResponseVM
+
+@{
+    ViewData["Title"] = "Transfer";
+}
+
+
+
+@if (Model != null && Model.UserName != null)
+{
+    <h4>Transfer for @Model.UserName</h4>
+}
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="TransferMoney" asp-antiforgery="true">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Account Holder Name (readonly) -->
+            <div class="form-group">
+                <label class="control-label">Account Holder Name</label>
+                <input type="text" class="form-control" value="@Model.UserName" readonly />
+            </div>
+            <!-- Hidden Input for UserName -->
+            <input type="hidden" asp-for="UserName" value="@Model.UserName" />
+            <!-- Account Number -->
+            <div class="form-group">
+                <label class="control-label">Sender Account Number </label>
+                <input asp-for="AccountNumber" class="form-control" placeholder="Enter Your Account Number" />
+                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label  class="control-label">Receiver Account Number</label>
+                <input asp-for="TargetAccountNumber" class="form-control" placeholder="Enter Receiver's Account Number" />
+                <span asp-validation-for="TargetAccountNumber" class="text-danger"></span>
+            </div>
+
+            <!-- Deposit Amount -->
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" class="form-control"
+                       value="@((Model.Amount == 0) ? "" : Model.Amount.ToString("0.00"))"
+                       placeholder="Enter Amount" />
+
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Send" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<hr />
+
+<!-- Displaying the Response if deposit was successful -->
+@if (Model.Amount > 0 && Model.TransactionId != null)
+{
+    <div>
+        <h4>Transfer Successful</h4>
+        <p><strong>Sender Account Number:</strong> @Model.AccountNumber</p>
+        <p><strong>Sender's Name':</strong> @Model.UserName</p>
+        <p><strong>Receiver Account Number:</strong> @Model.TargetAccountNumber</p>
+        <p><strong>Transfer Amount:</strong> @Model.Amount</p>
+        <p><strong>Previous Balance:</strong> @Model.PreviousBalance</p>
+        <p><strong>Current Balance:</strong> @Model.CurrentBalance</p>
+        <p><strong>Transaction ID:</strong> @Model.TransactionId</p>
+    </div>
+}
+else
+{
+    <p class="text-danger">No transfer made yet.</p>
+}
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

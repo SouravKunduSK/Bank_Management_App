@@ -6,9 +6,12 @@ namespace Bank_Management_Api.Models.Transactions
     {
         public string TransactionId { get; set; }
         public string AccountNumber { get; set; }
+        public string UserName { get; set; }
         public  TransactionType Type { get; set; } // Deposit, Withdrawal, Transfer
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string TargetAccountNumber { get; set; }
+        public decimal PreviousBalance { get; set; }
+        public decimal CurrentBalance { get; set; }
     }
 }

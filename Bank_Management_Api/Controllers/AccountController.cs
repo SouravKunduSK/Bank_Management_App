@@ -71,7 +71,7 @@ namespace Bank_Management_Api.Controllers
             return Ok(account);
         }
 
-        [HttpGet("all")]
+        [HttpGet("all-accounts")]
         public async Task<IActionResult> GetAllAccounts()
         {
             

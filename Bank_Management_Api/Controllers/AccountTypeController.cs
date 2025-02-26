@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bank_Management_Api.Controllers
 {
-    [Authorize(Roles = "Admin, BankStaff")]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AccountTypeController : ControllerBase
@@ -19,6 +19,7 @@ namespace Bank_Management_Api.Controllers
         {
             _accountTypeService = accountTypeService;
         }
+        [Authorize(Roles = "Admin, BankStaff, Customer")]
         // GET: api/<AccountTypeController>
         [HttpGet("all-account-types")]
         public async Task<IActionResult> GetAllTypes()
@@ -30,7 +31,7 @@ namespace Bank_Management_Api.Controllers
             }
             return Ok(accountTypes);
         }
-
+        [Authorize(Roles = "Admin, BankStaff")]
         // GET api/<AccountTypeController>/5
         [HttpGet("detail/{typeName}")]
         public async Task<IActionResult> GetType(string typeName)
@@ -46,7 +47,7 @@ namespace Bank_Management_Api.Controllers
             }
             return Ok(type);
         }
-
+        [Authorize(Roles = "Admin, BankStaff")]
         // POST api/<AccountTypeController>
         [HttpPost("create")]
         public async Task<IActionResult> CreateNewTypeWithLimit([FromBody] AccountTypeRequest accountType)
@@ -62,7 +63,7 @@ namespace Bank_Management_Api.Controllers
             }
             return Ok(response);
         }
-
+        [Authorize(Roles = "Admin, BankStaff")]
         // PUT api/<AccountTypeController>/5
         [HttpPut("edit/{id}")]
         public async Task<IActionResult> EditTypeOrLimit(int id, [FromBody] AccountTypeRequest accountType)
@@ -79,7 +80,7 @@ namespace Bank_Management_Api.Controllers
             return Ok(response);
 
         }
-
+        [Authorize(Roles = "Admin, BankStaff")]
         // DELETE api/<AccountTypeController>/5
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)

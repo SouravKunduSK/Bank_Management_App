@@ -1,0 +1,31 @@
+﻿@model List<Bank_Management_Api.Models.Account.AccountResponse>
+
+@{
+    ViewData["Title"] = "Account List";
+}
+
+<h2>Account List</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Account Number</th>
+            <th>Account Type</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var account in Model)
+        {
+            <tr>
+                <td>@account.AccountNumber</td>
+                <td>@account.AccountType</td>
+                <td>@account.Balance</td>
+                <td>@account.Status</td>
+                <td>@account.CreatedAt.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>

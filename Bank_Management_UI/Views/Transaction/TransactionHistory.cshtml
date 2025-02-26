@@ -1,0 +1,48 @@
+﻿@model Bank_Management_UI.Models.Transaction.AccountNumberVM
+
+<h1>Transaction History</h1>
+<!-- Form to select an account -->
+<form method="post" asp-action="TransactionHistory" asp-antiforgery="true">
+    @Html.AntiForgeryToken()  <!-- Anti-forgery token to protect against CSRF -->
+    <!-- Account Number Dropdown -->
+    <div class="form-group">
+        <label for="AccountNumber">Select Account Number</label>
+        <select asp-for="AccountNumber" class="form-control" asp-items="@(new SelectList(ViewBag.Accounts, "AccountNumber", "AccountNumber"))">
+            <option value="">Select Account</option>
+        </select>
+        <span asp-validation-for="AccountNumber" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- Display Transaction History if any -->
+@if (ViewBag.Transactions != null && ((List<Bank_Management_Api.Models.Transactions.TransactionResponse>)ViewBag.Transactions).Any())
+{
+    <h2>Transactions</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in ViewBag.Transactions)
+            {
+                <tr>
+                    <td>@transaction.TransactionId</td>
+                    <td>@transaction.Amount</td>
+                    <td>@transaction.Type</td>
+                    <td>@transaction.TransactionDate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No transactions found for the selected account.</p>
+}
