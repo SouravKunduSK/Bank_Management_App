@@ -54,7 +54,8 @@ namespace Bank_Management_Api.Services
                 Balance = request.InitialDeposit * exchangeRate,
                 UserId = userId,
                 CurrencyId = currency.CurrencyId,
-                AccountType =await _context.AccountTypes.FindAsync(request.AccountTypeId)
+                AccountType =await _context.AccountTypes.FindAsync(request.AccountTypeId),
+                Status = AccountStatus.OnProcessing
                  
             };
 
@@ -121,7 +122,8 @@ namespace Bank_Management_Api.Services
         public async Task<List<AccountResponse>> GetAllAccountsAsync(string userId=null)
         {
             IQueryable<Account> query =  _context.Accounts
-                                .Include(a => a.Currency);
+                                .Include(a => a.Currency)
+                                .Include(at=>at.AccountType);
             if(!string.IsNullOrEmpty(userId))
             {
                 query = query.Where(a => a.UserId == userId);
@@ -130,6 +132,7 @@ namespace Bank_Management_Api.Services
 
             return accounts.Select(account => new AccountResponse
             {
+                Id = account.Id,
                 AccountNumber = account.AccountNumber,
                 AccountType = account.AccountType.TypeName,
                 Balance = account.Balance,

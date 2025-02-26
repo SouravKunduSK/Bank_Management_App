@@ -1,0 +1,47 @@
+﻿@model Bank_Management_UI.Models.Account.CreateAccountModel
+
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<h2>Create Account</h2>
+
+<form method="post" asp-action="Create" asp-antiforgery="true">
+    @Html.AntiForgeryToken()
+    <!-- Readonly User Details -->
+    <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" asp-for="FullName" class="form-control" value="@Model.FullName" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" asp-for="Email" class="form-control" value="@Model.Email" readonly />
+    </div>
+
+    <!-- Account Type Dropdown -->
+    <div class="form-group">
+        <label>Account Type</label>
+        <select asp-for="AccountTypeId" class="form-control" asp-items="@(new SelectList(ViewBag.AccountTypes, "Id", "TypeName"))">
+            <option value="">Select Account Type</option>
+        </select>
+        <span asp-validation-for="AccountTypeId" class="text-danger"></span>
+    </div>
+
+    <!-- Currency Code Dropdown with Default 'BDT' -->
+    <div class="form-group">
+        <label>Currency Code</label>
+        <select asp-for="CurrencyCode" class="form-control" asp-items="@(new SelectList(ViewBag.Currencies))">
+        </select>
+        <span asp-validation-for="CurrencyCode" class="text-danger"></span>
+    </div>
+
+    <!-- Initial Deposit Field -->
+    <div class="form-group">
+        <label>Initial Deposit</label>
+        <input type="number" asp-for="InitialDeposit" class="form-control" placeholder="Enter initial deposit" />
+        <span asp-validation-for="InitialDeposit" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Account</button>
+</form>

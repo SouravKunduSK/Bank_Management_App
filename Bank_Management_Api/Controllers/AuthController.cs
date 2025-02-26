@@ -65,8 +65,19 @@ namespace Bank_Management_Api.Controllers
         $"<p>If this wasn't you, secure your account immediately.</p>");*/
             return Ok(response);
         }
+        [HttpGet("user-data")]
+        public async Task<IActionResult> GetUserData(string email)
+        {
+            var response = await _authService.UserDetailAsync(email);
+            if(response.FullName == "Not Found!")
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
 
         [HttpPost("refresh-token")]
+        
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenModel model)
         {
             if (string.IsNullOrEmpty(model.Token))
@@ -94,7 +105,18 @@ namespace Bank_Management_Api.Controllers
 
             return Ok("Token revoked successfully");
         }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] string refreshToken)
+        {
+            var response = await _authService.Logout(refreshToken);
 
+            if (response.Message == "Logout successful!")
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
+        }
         // Models for request bodies
         public class RefreshTokenModel
         {

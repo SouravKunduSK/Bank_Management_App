@@ -61,7 +61,7 @@ namespace Bank_Management_Data.Data
             .HasOne(l => l.Account)
             .WithMany(a => a.Loans)
             .HasForeignKey(l => l.AccountId)
-            .HasPrincipalKey(a => a.AccountNumber);
+            .HasPrincipalKey(a => a.Id);
 
             builder.Entity<Interest>()
                 .HasOne(i => i.Account)

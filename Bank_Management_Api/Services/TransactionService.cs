@@ -27,6 +27,7 @@ namespace Bank_Management_Api.Services
                 throw new Exception("Amount must be greater than zero.");
 
             var account = await _context.Accounts
+                .Include(u=>u.User)
                 .FirstOrDefaultAsync(a => a.AccountNumber == request.AccountNumber && a.UserId == userId);
 
             if (account == null)
@@ -38,28 +39,62 @@ namespace Bank_Management_Api.Services
             {
                 throw new Exception("Limit excceds for today!");
             }
-            
+            if (account.Status != AccountStatus.Active)
+            {
+                throw new Exception($"Account status {account.Status}");
+            }
+
+            var previousBalance = account.Balance;
             account.Balance += request.Amount;
+
             var transaction = new FundTransaction
             {
                 TransactionId = GenerateGUIDNumber.GenerateNumberUsingGuid(),
                 AccountNumber = request.AccountNumber,
                 Type = TransactionType.Deposit,
-                Amount = request.Amount
+                Amount = request.Amount,
+                Account = account
             };
 
-            _context.Transactions.Add(transaction);
-            await _context.SaveChangesAsync();
-
-            var responseData = new TransactionResponse
+            // Begin a database transaction
+            using (var transactionDb = await _context.Database.BeginTransactionAsync())
             {
-                TransactionId = transaction.TransactionId,
-                AccountNumber = account.AccountNumber,
-                Type = transaction.Type,
-                Amount = transaction.Amount,
-                TransactionDate = transaction.TransactionDate
-            };
-            return responseData;
+                try
+                {
+                    // Add the transaction to the context
+                    _context.Transactions.Add(transaction);
+
+                    // Update the account balance in the context
+                    _context.Accounts.Update(account);
+
+                    // Save changes (this will save both the account update and the transaction)
+                    await _context.SaveChangesAsync();
+
+                    // Commit the transaction
+                    await transactionDb.CommitAsync();
+
+                    // Return the response data
+                    var responseData = new TransactionResponse
+                    {
+                        TransactionId = transaction.TransactionId,
+                        AccountNumber = account.AccountNumber,
+                        Type = transaction.Type,
+                        Amount = transaction.Amount,
+                        TransactionDate = transaction.TransactionDate,
+                        PreviousBalance = previousBalance,
+                        CurrentBalance = account.Balance,
+                        UserName = account.User.FullName
+                    };
+
+                    return responseData;
+                }
+                catch (Exception ex)
+                {
+                    // Rollback in case of an error
+                    await transactionDb.RollbackAsync();
+                    throw new Exception("Transaction failed: " + ex.Message);
+                }
+            }
 
         }
 
@@ -89,9 +124,11 @@ namespace Bank_Management_Api.Services
                 throw new Exception("Cannot transfer to the same account!");
 
             var sourceAccount = await _context.Accounts
+                .Include(u=>u.User)
                 .FirstOrDefaultAsync(a => a.AccountNumber == request.AccountNumber && a.UserId == userId);
 
             var targetAccount = await _context.Accounts
+                .Include(u=>u.User)
                 .FirstOrDefaultAsync(a => a.AccountNumber == request.TargetAccountNumber);
 
             if (sourceAccount == null || targetAccount == null)
@@ -109,6 +146,7 @@ namespace Bank_Management_Api.Services
             {
                 try
                 {
+                    var prevBalance = sourceAccount.Balance;
                     // Perform the transfer
                     sourceAccount.Balance -= request.Amount;
                     targetAccount.Balance += request.Amount;
@@ -122,8 +160,9 @@ namespace Bank_Management_Api.Services
                         Amount = request.Amount,
                         Account = sourceAccount
                     };
-
                     _context.Transactions.Add(transactionEntity);
+                    _context.Accounts.Update(sourceAccount);
+                    _context.Accounts.Update(targetAccount);
                     await _context.SaveChangesAsync();
 
                     // Commit the transaction
@@ -136,7 +175,10 @@ namespace Bank_Management_Api.Services
                         TargetAccountNumber = transactionEntity.TargetAccountNumber,
                         Type = transactionEntity.Type,
                         Amount = transactionEntity.Amount,
-                        TransactionDate = transactionEntity.TransactionDate
+                        TransactionDate = transactionEntity.TransactionDate,
+                        UserName = sourceAccount.User.UserName,
+                        CurrentBalance = sourceAccount.Balance,
+                        PreviousBalance = prevBalance
                     };
                 }
                 catch (Exception)
@@ -155,6 +197,7 @@ namespace Bank_Management_Api.Services
                 throw new Exception("Amount must be greater than zero.");
 
             var account = await _context.Accounts
+                .Include(u=>u.User)
                 .FirstOrDefaultAsync(a => a.AccountNumber == request.AccountNumber && a.UserId == userId);
 
             if (account == null)
@@ -166,6 +209,11 @@ namespace Bank_Management_Api.Services
             {
                 throw new Exception("Limit excceds for today!");
             }
+            if(account.Status != AccountStatus.Active)
+            {
+                throw new Exception($"Account status {account.Status}");
+            }
+            var prevBalance = account.Balance;
             account.Balance -= request.Amount;
 
             var transaction = new FundTransaction
@@ -177,17 +225,45 @@ namespace Bank_Management_Api.Services
                 Account = account
             };
 
-            _context.Transactions.Add(transaction);
-            await _context.SaveChangesAsync();
-
-            return new TransactionResponse
+            // Begin a database transaction
+            using (var transactionDb = await _context.Database.BeginTransactionAsync())
             {
-                TransactionId = transaction.TransactionId,
-                AccountNumber = transaction.AccountNumber,
-                Type = transaction.Type,
-                Amount = transaction.Amount,
-                TransactionDate = transaction.TransactionDate
-            };
+                try
+                {
+                    // Add the transaction to the context
+                    _context.Transactions.Add(transaction);
+
+                    // Update the account balance in the context
+                    _context.Accounts.Update(account);
+
+                    // Save changes (this will save both the account update and the transaction)
+                    await _context.SaveChangesAsync();
+
+                    // Commit the transaction
+                    await transactionDb.CommitAsync();
+
+                    // Return the response data
+                    var responseData = new TransactionResponse
+                    {
+                        TransactionId = transaction.TransactionId,
+                        AccountNumber = account.AccountNumber,
+                        Type = transaction.Type,
+                        Amount = transaction.Amount,
+                        TransactionDate = transaction.TransactionDate,
+                        PreviousBalance = prevBalance,
+                        CurrentBalance = account.Balance,
+                        UserName = account.User.FullName
+                    };
+
+                    return responseData;
+                }
+                catch (Exception ex)
+                {
+                    // Rollback in case of an error
+                    await transactionDb.RollbackAsync();
+                    throw new Exception("Transaction failed: " + ex.Message);
+                }
+            }
         }
     }
 }
